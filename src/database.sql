@@ -12,3 +12,4 @@ create TABLE contacts(
 -- psql \! chcp 1251 - russian
 -- \dt 
 -- select * from contacts; 
+-- pg

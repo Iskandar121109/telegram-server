@@ -3,9 +3,6 @@ const app = express();
 const port = 3001;
 const cors = require('cors');
 const bodyParser = require('body-parser');
-// const contactRouter = require('../routes/contact.routes')
-const { uuid } = require('uuidv4');
-const { useParams } = require('react-router-dom');
 const LocalStorage = require('node-localstorage').LocalStorage
 localStorage = new LocalStorage('./data');
 
@@ -137,8 +134,8 @@ app.get("/", (req, res) => {
 // let messages = [];
 // localStorage.setItem('messages',JSON.stringify(messages));
 
-app.get("/contacts", (req, res) => {
-  res.send(localStorage.getItem('contacts'))
+app.get("/users", (req, res) => {
+  res.send(localStorage.getItem('users'))
 })
 
 app.get('/messeges', (req, res) => {
@@ -148,10 +145,19 @@ app.get('/messeges', (req, res) => {
 app.get('/messages-contact/:id', (req, res) => {
   const { id } = req.params;
   const messages = localStorage.getItem('messages');
-  const fiterMessages = JSON.parse(messages).filter(message => message.receiverId === id)
+  const fiterMessages = JSON.parse(messages).filter(message => message.senderId === id)
   res.send(fiterMessages);
 });
 
+app.get('/message-user/:id/:contactid', (req, res) => {
+  const { id, contactid } = req.params;
+  const messages = localStorage.getItem('messages');
+  const fiterMessages = JSON.parse(messages).filter((message) => (
+    (message.senderId === contactid && message.receiverId === id)
+    || (message.senderId === id && message.receiverId === contactid)
+  ))
+  res.send(fiterMessages)
+});
 
 app.post('/create-messages', (req, res) => {
   const messages = localStorage.getItem('messages');
@@ -194,7 +200,8 @@ app.post('/create-user', (req, res) => {
     return res.status(409).send('Пользователь с таким логином уже существует.');
   }
   const newUser = [...users, user]
-  localStorage.setItem('users',JSON.stringify(newUser));
+  localStorage.setItem('users', JSON.stringify(newUser));
+
   res.send(users);
 });
 
